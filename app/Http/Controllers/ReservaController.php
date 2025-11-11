@@ -7,6 +7,8 @@ use App\Http\Requests\UpdateReservaRequest;
 use App\Models\Cliente;
 use App\Models\Paquete;
 use App\Models\Reserva;
+use App\Models\Guia;
+use App\Models\Transporte;
 use Illuminate\Http\Request;
 
 class ReservaController extends Controller
@@ -39,8 +41,22 @@ class ReservaController extends Controller
      */
     public function Store(StoreReservaRequest $request)
     {
-        // Crear reserva con datos validados
-        Reserva::create($request->validated());
+        $datos = $request->validated();
+        
+        // Calcular precio total basado en el paquete y número de personas
+        $paquete = Paquete::find($datos['paquete_id']);
+        if ($paquete) {
+            $numPersonas = $datos['num_personas'] ?? 1;
+            $datos['precio_total'] = $paquete->precio * $numPersonas;
+            $datos['num_personas'] = $numPersonas;
+            
+            // Calcular fecha_fin basándose en fecha_inicio
+            $fechaInicio = \Carbon\Carbon::parse($datos['fecha_inicio']);
+            $datos['fecha_fin'] = $fechaInicio->copy()->addDays($paquete->duracion);
+        }
+        
+        // Crear reserva con datos calculados
+        Reserva::create($datos);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente.');
     }
@@ -73,7 +89,35 @@ class ReservaController extends Controller
     public function update(UpdateReservaRequest $request, string $id)
     {
         $reserva = Reserva::findOrFail($id);
-        $reserva->update($request->validated());
+        $datos = $request->validated();
+        
+        // Calcular precio total basado en el paquete y número de personas
+        if (isset($datos['paquete_id']) && isset($datos['num_personas'])) {
+            $paquete = Paquete::find($datos['paquete_id']);
+            if ($paquete) {
+                $datos['precio_total'] = $paquete->precio * $datos['num_personas'];
+                
+                // Calcular fecha_fin basándose en fecha_inicio
+                if (isset($datos['fecha_inicio'])) {
+                    $fechaInicio = \Carbon\Carbon::parse($datos['fecha_inicio']);
+                    $datos['fecha_fin'] = $fechaInicio->copy()->addDays($paquete->duracion);
+                }
+            }
+        } elseif (isset($datos['paquete_id'])) {
+            $paquete = Paquete::find($datos['paquete_id']);
+            if ($paquete) {
+                $numPersonas = $datos['num_personas'] ?? $reserva->num_personas ?? 1;
+                $datos['precio_total'] = $paquete->precio * $numPersonas;
+                
+                // Recalcular fecha_fin si hay cambio de paquete
+                if (isset($datos['fecha_inicio'])) {
+                    $fechaInicio = \Carbon\Carbon::parse($datos['fecha_inicio']);
+                    $datos['fecha_fin'] = $fechaInicio->copy()->addDays($paquete->duracion);
+                }
+            }
+        }
+        
+        $reserva->update($datos);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva actualizada correctamente.');
     }
@@ -87,5 +131,49 @@ class ReservaController extends Controller
         $reserva->delete();
 
         return redirect()->route('reservas.index')->with('success', 'Reserva eliminada correctamente.');
+    }
+
+    /**
+     * Obtener guías disponibles para una fecha específica (AJAX)
+     */
+    public function guiasDisponibles(Request $request)
+    {
+        $fecha = $request->input('fecha');
+        
+        // Obtener IDs de guías ya asignados en esa fecha
+        $guiasOcupados = Reserva::whereDate('fecha_reserva', $fecha)
+            ->with('paquete.guias')
+            ->get()
+            ->pluck('paquete.guias')
+            ->flatten()
+            ->pluck('id')
+            ->unique();
+        
+        // Obtener guías disponibles
+        $guiasDisponibles = Guia::whereNotIn('id', $guiasOcupados)->get();
+        
+        return response()->json($guiasDisponibles);
+    }
+
+    /**
+     * Obtener transportes disponibles para una fecha específica (AJAX)
+     */
+    public function transportesDisponibles(Request $request)
+    {
+        $fecha = $request->input('fecha');
+        
+        // Obtener IDs de transportes ya asignados en esa fecha
+        $transportesOcupados = Reserva::whereDate('fecha_reserva', $fecha)
+            ->with('paquete.transportes')
+            ->get()
+            ->pluck('paquete.transportes')
+            ->flatten()
+            ->pluck('id')
+            ->unique();
+        
+        // Obtener transportes disponibles
+        $transportesDisponibles = Transporte::whereNotIn('id', $transportesOcupados)->get();
+        
+        return response()->json($transportesDisponibles);
     }
 }

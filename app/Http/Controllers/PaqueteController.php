@@ -39,7 +39,13 @@ class PaqueteController extends Controller
 
             // Guardar imagen si se subió
             if ($request->hasFile('imagen')) {
-                $datos['imagen'] = $request->file('imagen')->store('paquetes', 'public');
+                $archivo = $request->file('imagen');
+                $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
+                
+                // Guardar directamente en public/storage/paquetes
+                $archivo->move(public_path('storage/paquetes'), $nombreArchivo);
+                
+                $datos['imagen'] = 'paquetes/' . $nombreArchivo;
             }
 
             Paquete::create($datos);
@@ -48,7 +54,7 @@ class PaqueteController extends Controller
             return redirect()->route('paquetes.index')->with('success', 'Paquete creado exitosamente.');
         } catch (\Throwable $th) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Ocurrió un error al crear el paquete.');
+            return redirect()->back()->with('error', 'Ocurrió un error al crear el paquete: ' . $th->getMessage());
         }
     }
 
@@ -77,14 +83,29 @@ class PaqueteController extends Controller
             $datos = $request->validated();
 
             if ($request->hasFile('imagen')) {
-                $datos['imagen'] = $request->file('imagen')->store('paquetes', 'public');
+                // Eliminar imagen anterior si existe
+                if ($paquete->imagen) {
+                    $rutaAnterior = public_path('storage/' . $paquete->imagen);
+                    if (file_exists($rutaAnterior)) {
+                        unlink($rutaAnterior);
+                    }
+                }
+                
+                // Guardar nueva imagen
+                $archivo = $request->file('imagen');
+                $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
+                
+                // Guardar directamente en public/storage/paquetes
+                $archivo->move(public_path('storage/paquetes'), $nombreArchivo);
+                
+                $datos['imagen'] = 'paquetes/' . $nombreArchivo;
             }
 
             $paquete->update($datos);
 
             return redirect()->route('paquetes.index')->with('success', 'Paquete actualizado correctamente.');
         } catch (\Throwable $th) {
-            return redirect()->back()->with('error', 'Ocurrió un error al actualizar el paquete.');
+            return redirect()->back()->with('error', 'Ocurrió un error al actualizar el paquete: ' . $th->getMessage());
         }
     }
 
@@ -96,10 +117,12 @@ class PaqueteController extends Controller
         // Buscar paquete por ID, si no existe lanzará excepción 404
         $paquete = Paquete::findOrFail($id);
 
-        // Opcional: eliminar imagen asociada si tienes manejo de archivos
+        // Eliminar imagen asociada si existe
         if ($paquete->imagen) {
-            // Usar Storage para borrar la imagen
-            \Illuminate\Support\Facades\Storage::delete($paquete->imagen);
+            $rutaImagen = public_path('storage/' . $paquete->imagen);
+            if (file_exists($rutaImagen)) {
+                unlink($rutaImagen);
+            }
         }
 
         // Eliminar paquete

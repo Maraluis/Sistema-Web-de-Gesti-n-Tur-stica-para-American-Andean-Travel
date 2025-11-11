@@ -90,7 +90,6 @@
                     <!--begin::Footer-->
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">Guardar</button>
-                        <button type="reset" class="btn btn-secondary">Reiniciar</button>
                     </div>
                     <!--end::Footer-->
                 </form>

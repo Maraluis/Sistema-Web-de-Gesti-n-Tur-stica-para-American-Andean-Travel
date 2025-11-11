@@ -58,6 +58,18 @@
                            <p>TRANSPORTE</p>
                        </a>
                    </li>
+                   <li class="nav-item">
+                       <a href="{{ route('hoteles.index') }}" class="nav-link">
+                           <i class="nav-icon bi bi-building"></i>
+                           <p>HOTELES</p>
+                       </a>
+                   </li>
+                   <li class="nav-item">
+                       <a href="{{ route('restaurantes.index') }}" class="nav-link">
+                           <i class="nav-icon bi bi-cup-hot"></i>
+                           <p>RESTAURANTES</p>
+                       </a>
+                   </li>
                </ul>
                <!--end::Sidebar Menu-->
            </nav>

@@ -102,6 +102,16 @@
                                     <small class="text-danger">*.{{ $message }}</small>
                                 @enderror
                             </div>
+
+                            <!-- Campo de Nacionalidad -->
+                            <div class="mb-3 col-md-6">
+                                <label for="nacionalidad" class="form-label">Nacionalidad:</label>
+                                <input type="text" class="form-control" id="nacionalidad" name="nacionalidad"
+                                    placeholder="Ej: Peruana, Argentina, etc." value="{{ old('nacionalidad') }}">
+                                @error('nacionalidad')
+                                    <small class="text-danger">*.{{ $message }}</small>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                     <!--end::Body-->

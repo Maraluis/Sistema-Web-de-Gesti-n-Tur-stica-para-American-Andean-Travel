@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Paquete extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'nombre',
         'destino',
@@ -33,5 +36,19 @@ class Paquete extends Model
     public function opiniones()
     {
         return $this->hasMany(Opinion::class);
+    }
+
+    public function hoteles()
+    {
+        return $this->belongsToMany(Hotel::class, 'hotel_paquete')
+                    ->withPivot('noches')
+                    ->withTimestamps();
+    }
+
+    public function restaurantes()
+    {
+        return $this->belongsToMany(Restaurante::class, 'paquete_restaurante')
+                    ->withPivot('tipo_servicio')
+                    ->withTimestamps();
     }
 }

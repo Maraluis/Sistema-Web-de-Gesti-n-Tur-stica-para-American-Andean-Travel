@@ -48,10 +48,14 @@
         <!--end::App Content Header-->
         <div class="app-content">
             <div class="container-fluid">
-                <a href="{{ route('clientes.create') }}">
-                    <button type="button" class="btn btn-outline-primary mb-2"><i class="bi bi-plus-circle"></i>
-                        Nuevo</button>
-                </a>
+                <div class="d-flex justify-content-between mb-3">
+                    <a href="{{ route('clientes.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nuevo Cliente
+                    </a>
+                    <a href="{{ route('reportes.clientes') }}" class="btn btn-danger" target="_blank">
+                        <i class="bi bi-file-pdf"></i> Reporte PDF - Todos los Clientes
+                    </a>
+                </div>
                 {{-- TABLA DE DATOS --}}
                 <div class="card mb-4">
                     <div class="card-header">

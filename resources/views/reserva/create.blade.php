@@ -52,21 +52,54 @@
                         <label for="fecha_reserva" class="form-label">Fecha de Reserva</label>
                         <input type="date" name="fecha_reserva" id="fecha_reserva"
                             class="form-control @error('fecha_reserva') is-invalid @enderror"
-                            value="{{ old('fecha_reserva') }}" required min="{{ date('Y-m-d') }}">
+                            value="{{ old('fecha_reserva', date('Y-m-d')) }}" required min="{{ date('Y-m-d') }}">
                         @error('fecha_reserva')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Fecha en que se realiza la reserva (hoy)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="fecha_inicio" class="form-label">Fecha de Inicio del Tour</label>
+                        <input type="date" name="fecha_inicio" id="fecha_inicio"
+                            class="form-control @error('fecha_inicio') is-invalid @enderror"
+                            value="{{ old('fecha_inicio') }}" required min="{{ date('Y-m-d') }}">
+                        @error('fecha_inicio')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">Fecha en que comenzará el viaje/tour</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="num_personas" class="form-label">Número de Personas</label>
+                        <input type="number" name="num_personas" id="num_personas"
+                            class="form-control @error('num_personas') is-invalid @enderror"
+                            value="{{ old('num_personas', 1) }}" required min="1" max="50">
+                        @error('num_personas')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <small class="text-muted">El precio se calculará automáticamente según el paquete</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado de Reserva</label>
+                        <select name="estado" id="estado" class="form-select @error('estado') is-invalid @enderror" required>
+                            <option value="pendiente" {{ old('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                            <option value="confirmada" {{ old('estado') == 'confirmada' ? 'selected' : '' }}>Confirmada</option>
+                            <option value="cancelada" {{ old('estado') == 'cancelada' ? 'selected' : '' }}>Cancelada</option>
+                        </select>
+                        @error('estado')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="estado" class="form-label">Estado</label>
-                        <select name="estado" id="estado" class="form-select @error('estado') is-invalid @enderror" required>
-                            <option value="pendiente" {{ old('estado') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                            <option value="confirmada" {{ old('estado') == 'confirmada' ? 'selected' : '' }}>Confirmada</option>
-                            <option value="pagada" {{ old('estado') == 'pagada' ? 'selected' : '' }}>Pagada</option>
-                            <option value="cancelada" {{ old('estado') == 'cancelada' ? 'selected' : '' }}>Cancelada</option>
+                        <label for="estado_pago" class="form-label">Estado de Pago</label>
+                        <select name="estado_pago" id="estado_pago" class="form-select @error('estado_pago') is-invalid @enderror" required>
+                            <option value="pendiente" {{ old('estado_pago') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                            <option value="pagado" {{ old('estado_pago') == 'pagado' ? 'selected' : '' }}>Pagado</option>
                         </select>
-                        @error('estado')
+                        @error('estado_pago')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

@@ -32,9 +32,6 @@
                     <!--end::User Image-->
                     <!--begin::Menu Footer-->
                     <li class="user-footer">
-                        <a href="#" class="btn btn-default btn-flat text-bg-warning">
-                            <i class="fas fa-user-circle"></i> Perfil
-                        </a>
                         <a href="{{ route('logout') }}" class="btn btn-default btn-flat float-end text-bg-danger">
                             <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                         </a>

@@ -25,7 +25,10 @@ class UpdateReservaRequest extends FormRequest
             'cliente_id' => ['required', 'exists:clientes,id'],
             'paquete_id' => ['required', 'exists:paquetes,id'],
             'fecha_reserva' => ['required', 'date', 'after_or_equal:today'],
-            'estado' => ['required', 'in:pendiente,confirmada,pagada,cancelada'],
+            'fecha_inicio' => ['required', 'date', 'after_or_equal:fecha_reserva'],
+            'num_personas' => ['required', 'integer', 'min:1', 'max:50'],
+            'estado' => ['required', 'in:pendiente,confirmada,cancelada'],
+            'estado_pago' => ['required', 'in:pendiente,pagado'],
             'detalles' => ['nullable', 'string'],
         ];
     }

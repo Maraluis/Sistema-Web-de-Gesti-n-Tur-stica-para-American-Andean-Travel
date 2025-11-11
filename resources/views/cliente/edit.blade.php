@@ -112,13 +112,22 @@
                                     <small class="text-danger">*.{{ $message }}</small>
                                 @enderror
                             </div>
+
+                            <!-- Campo de Nacionalidad -->
+                            <div class="mb-3 col-md-6">
+                                <label for="nacionalidad" class="form-label">Nacionalidad:</label>
+                                <input type="text" class="form-control" id="nacionalidad" name="nacionalidad"
+                                    placeholder="Ej: Peruana, Argentina, etc." value="{{ old('nacionalidad', $cliente->nacionalidad) }}">
+                                @error('nacionalidad')
+                                    <small class="text-danger">*.{{ $message }}</small>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                     <!--end::Body-->
                     <!--begin::Footer-->
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">Guardar</button>
-                        <button type="reset" class="btn btn-secondary">Reiniciar</button>
                     </div>
                     <!--end::Footer-->
                 </form>

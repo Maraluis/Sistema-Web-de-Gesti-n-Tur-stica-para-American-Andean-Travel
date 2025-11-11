@@ -1,0 +1,160 @@
+
+
+<?php $__env->startPush('css'); ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php $__env->stopPush(); ?>
+
+<?php $__env->startSection('content'); ?>
+    <?php if(@session('success')): ?>
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "success",
+                title: "<?php echo e(session('success')); ?>"
+            });
+        </script>
+    <?php endif; ?>
+    <main class="app-main">
+        <!--begin::App Content Header-->
+        <div class="app-content-header">
+            <!--begin::Container-->
+            <div class="container-fluid">
+                <!--begin::Row-->
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h3 class="mb-0">Clientes</h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-end">
+                            <li class="breadcrumb-item"><a href="<?php echo e(route('panel.index')); ?>">Inicio</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Clientes</li>
+                        </ol>
+                    </div>
+                </div>
+                <!--end::Row-->
+            </div>
+            <!--end::Container-->
+        </div>
+        <!--end::App Content Header-->
+        <div class="app-content">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between mb-3">
+                    <a href="<?php echo e(route('clientes.create')); ?>" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nuevo Cliente
+                    </a>
+                    <a href="<?php echo e(route('reportes.clientes')); ?>" class="btn btn-danger" target="_blank">
+                        <i class="bi bi-file-pdf"></i> Reporte PDF - Todos los Clientes
+                    </a>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Tabla de clientes</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Documento</th>
+                                    <th>Correo</th>
+                                    <th>Telefono</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php $__currentLoopData = $clientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cliente): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr class="align-middle">
+                                        <td><?php echo e($cliente->nombres); ?></td>
+                                        <td><?php echo e($cliente->apellidos); ?></td>
+                                        <td>
+                                            <?php
+                                                $tipos = [
+                                                    'dni' => 'DNI',
+                                                    'carnet' => 'Carnet de extranjería',
+                                                    'pasaporte' => 'Pasaporte',
+                                                    'ptp' => 'Permiso Temporal de Permanencia',
+                                                    'otro' => 'Otro',
+                                                ];
+                                                $tipoMostrar =
+                                                    $tipos[$cliente->tipo_documento] ?? $cliente->tipo_documento;
+                                            ?>
+
+                                            <strong><?php echo e($tipoMostrar); ?>:</strong><br>
+                                            <?php echo e($cliente->documento); ?>
+
+                                        </td>
+                                        <td><?php echo e($cliente->correo); ?></td>
+                                        <td><?php echo e($cliente->telefono); ?></td>
+                                        <td>
+                                            <a href="<?php echo e(route('clientes.edit', ['cliente' => $cliente])); ?>"
+                                                class="btn btn-warning btn-sm">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </a>
+
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#modalEliminar-<?php echo e($cliente->id); ?>">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </button>
+
+                                            <div class="modal fade" id="modalEliminar-<?php echo e($cliente->id); ?>" tabindex="-1"
+                                                aria-labelledby="modalLabel-<?php echo e($cliente->id); ?>" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5"
+                                                                id="modalLabel-<?php echo e($cliente->id); ?>">Confirmar eliminación
+                                                            </h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Cerrar"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            ¿Estás seguro que quieres eliminar al cliente
+                                                            <strong><?php echo e($cliente->nombres); ?>
+
+                                                                <?php echo e($cliente->apellidos); ?></strong>?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cancelar</button>
+                                                            <form
+                                                                action="<?php echo e(route('clientes.destroy', ['cliente' => $cliente])); ?>"
+                                                                method="POST" style="display:inline;">
+                                                                <?php echo csrf_field(); ?>
+                                                                <?php echo method_field('DELETE'); ?>
+                                                                <button type="submit" class="btn btn-danger">Sí,
+                                                                    eliminar</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+    </main>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('js'); ?>
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('template', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\gestion-paquetes - copia\resources\views/cliente/index.blade.php ENDPATH**/ ?>

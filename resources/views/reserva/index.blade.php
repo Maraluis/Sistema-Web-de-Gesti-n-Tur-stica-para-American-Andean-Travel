@@ -44,7 +44,10 @@
                 </div>
                 <div class="col-sm-6 text-end">
                     <a href="{{ route('reservas.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Nueva Reserva
+                        <i class="bi bi-plus-circle"></i> Nueva Reserva
+                    </a>
+                    <a href="{{ route('reportes.todas.reservas') }}" class="btn btn-danger" target="_blank">
+                        <i class="bi bi-file-pdf"></i> Reporte PDF - Todas las Reservas
                     </a>
                 </div>
             </div>
@@ -69,9 +72,11 @@
                                     <th>#</th>
                                     <th>Cliente</th>
                                     <th>Paquete</th>
-                                    <th>Fecha de Reserva</th>
-                                    <th>Estado</th>
-                                    <th>Detalles</th>
+                                    <th>Fecha Reserva</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Precio Total</th>
+                                    <th>Estado Reserva</th>
+                                    <th>Estado Pago</th>
                                     <th class="text-center" style="width:120px;">Acciones</th>
                                 </tr>
                             </thead>
@@ -82,30 +87,61 @@
                                     <td>{{ $reserva->cliente->nombres ?? 'N/A' }} {{ $reserva->cliente->apellidos ?? '' }}</td>
                                     <td>{{ $reserva->paquete->nombre ?? 'N/A' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($reserva->fecha_reserva)->format('d/m/Y') }}</td>
+                                    <td>{{ $reserva->fecha_inicio ? \Carbon\Carbon::parse($reserva->fecha_inicio)->format('d/m/Y') : 'N/A' }}</td>
+                                    <td><strong>S/ {{ number_format($reserva->precio_total ?? 0, 2) }}</strong></td>
                                     <td>
-                                        <span class="estado-{{ $reserva->estado }}">
-                                            {{ ucfirst($reserva->estado) }}
-                                        </span>
+                                        @if($reserva->estado == 'confirmada')
+                                            <span class="badge bg-success">Confirmada</span>
+                                        @elseif($reserva->estado == 'pendiente')
+                                            <span class="badge bg-warning">Pendiente</span>
+                                        @else
+                                            <span class="badge bg-danger">Cancelada</span>
+                                        @endif
                                     </td>
                                     <td>
-                                        @if($reserva->detalles)
-                                            {{ Str::limit($reserva->detalles, 50) }}
+                                        @if($reserva->estado_pago == 'pagado')
+                                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Pagado</span>
                                         @else
-                                            <em>No hay detalles</em>
+                                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Pendiente</span>
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('reservas.edit', $reserva->id) }}" class="btn btn-sm btn-warning" title="Editar">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('reservas.show', $reserva->id) }}" class="btn btn-sm btn-info" title="Ver Detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            
+                                            <a href="{{ route('reservas.edit', $reserva->id) }}" class="btn btn-sm btn-warning" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
 
-                                        <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar esta reserva?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-danger" title="Eliminar">
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar-{{ $reserva->id }}" title="Eliminar">
                                                 <i class="bi bi-trash"></i>
                                             </button>
-                                        </form>
+                                        </div>
+
+                                        <!-- Modal Eliminación -->
+                                        <div class="modal fade" id="modalEliminar-{{ $reserva->id }}" tabindex="-1" aria-labelledby="modalLabel-{{ $reserva->id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modalLabel-{{ $reserva->id }}">Confirmar eliminación</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        ¿Estás seguro que quieres eliminar la reserva de <strong>{{ $reserva->cliente->nombres }} {{ $reserva->cliente->apellidos }}</strong> para el paquete <strong>{{ $reserva->paquete->nombre }}</strong>?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" style="display:inline;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach
