@@ -79,15 +79,17 @@
 
                             <div class="mb-3 col-md-6">
                                 <label for="foto" class="form-label">Foto:</label>
-                                <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
-                                @if ($guia->foto)
-                                    <div class="mt-2">
-                                        <img src="{{ asset('storage/' . $guia->foto) }}" alt="Foto del guía" class="img-thumbnail" width="120">
-                                    </div>
-                                @endif
+                                <input type="file" class="form-control" id="foto" name="foto" accept="image/*" onchange="previewImage(event)">
                                 @error('foto')
                                     <small class="text-danger">*.{{ $message }}</small>
                                 @enderror
+                                <div class="mt-2">
+                                    @if ($guia->foto)
+                                        <img id="preview" src="{{ asset('storage/' . $guia->foto) }}" alt="Foto del guía" class="img-thumbnail" style="max-width: 200px; max-height: 200px; object-fit: cover;">
+                                    @else
+                                        <img id="preview" src="" alt="Vista previa" class="img-thumbnail" style="display: none; max-width: 200px; max-height: 200px;">
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -102,4 +104,19 @@
 @endsection
 
 @push('js')
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('preview');
+        const file = event.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
 @endpush

@@ -33,11 +33,6 @@ class Paquete extends Model
         return $this->belongsToMany(Transporte::class);
     }
 
-    public function opiniones()
-    {
-        return $this->hasMany(Opinion::class);
-    }
-
     public function hoteles()
     {
         return $this->belongsToMany(Hotel::class, 'hotel_paquete')

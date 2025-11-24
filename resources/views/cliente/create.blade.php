@@ -97,7 +97,7 @@
                             <div class="mb-3 col-md-6">
                                 <label for="telefono" class="form-label">Teléfono:</label>
                                 <input type="tel" class="form-control" id="telefono" name="telefono"
-                                    placeholder="Ej: +51 987654321" pattern="^\+?\d{7,15}$" value="{{ old('telefono') }}">
+                                    placeholder="Ej: +1 415 902 7784" value="{{ old('telefono') }}">
                                 @error('telefono')
                                     <small class="text-danger">*.{{ $message }}</small>
                                 @enderror

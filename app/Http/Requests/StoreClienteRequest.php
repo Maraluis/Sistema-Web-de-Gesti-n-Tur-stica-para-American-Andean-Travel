@@ -27,7 +27,16 @@ class StoreClienteRequest extends FormRequest
             'tipo_documento' => ['required', 'in:dni,carnet,pasaporte,ptp,otro'],
             'documento' => ['required', 'string', 'max:255', 'unique:clientes,documento'],
             'correo' => ['required', 'string', 'email', 'max:255', 'unique:clientes,correo'],
-            'telefono' => ['required', 'string', 'max:255'],
+            'telefono' => ['required', 'string', 'max:25'],
+            'nacionalidad' => ['nullable', 'string', 'max:100'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'telefono.max' => 'El teléfono no puede tener más de 25 caracteres.',
         ];
     }
 }

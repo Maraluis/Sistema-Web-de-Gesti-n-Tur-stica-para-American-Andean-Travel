@@ -33,7 +33,6 @@ class GuiaController extends Controller
      */
     public function store(StoreGuiaRequest  $request)
     {
-        //dd($request);
         try {
             DB::beginTransaction();
 
@@ -50,6 +49,9 @@ class GuiaController extends Controller
             return redirect()->route('guias.index')->with('success', 'Guía de turismo creado exitosamente.');
         } catch (\Throwable $th) {
             DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Error al crear la guía: ' . $th->getMessage())
+                ->withInput();
         }
     }
 
@@ -75,22 +77,33 @@ class GuiaController extends Controller
     public function update(UpdateGuiaRequest $request, Guia $guia)
     {
         try {
+            DB::beginTransaction();
+            
             // Validar y obtener datos
             $datos = $request->validated();
 
-            // Si hay una nueva foto, puedes manejarla aquí (opcional)
+            // Si hay una nueva foto, eliminar la anterior y guardar la nueva
             if ($request->hasFile('foto')) {
-                $foto = $request->file('foto')->store('guias', 'public');
-                $datos['foto'] = $foto;
+                // Eliminar foto anterior si existe
+                if ($guia->foto && \Storage::disk('public')->exists($guia->foto)) {
+                    \Storage::disk('public')->delete($guia->foto);
+                }
+                
+                // Guardar nueva foto
+                $datos['foto'] = $request->file('foto')->store('fotos_guias', 'public');
             }
 
             // Actualizar guía
             $guia->update($datos);
 
+            DB::commit();
+
             return redirect()->route('guias.index')
                 ->with('success', 'Guía actualizada correctamente.');
         } catch (\Throwable $th) {
-           
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Error al actualizar la guía: ' . $th->getMessage());
         }
     }
 

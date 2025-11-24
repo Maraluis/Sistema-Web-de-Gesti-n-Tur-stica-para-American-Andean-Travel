@@ -80,10 +80,13 @@
                         <!-- Foto -->
                         <div class="mb-3 col-md-6">
                             <label for="foto" class="form-label">Foto:</label>
-                            <input type="file" class="form-control" id="foto" name="foto" accept="image/*" />
+                            <input type="file" class="form-control" id="foto" name="foto" accept="image/*" onchange="previewImage(event)" />
                             @error('foto')
                                 <small class="text-danger">*.{{ $message }}</small>
                             @enderror
+                            <div class="mt-2">
+                                <img id="preview" src="" alt="Vista previa" class="img-thumbnail" style="display: none; max-width: 200px; max-height: 200px;">
+                            </div>
                         </div>
 
                     </div>
@@ -98,4 +101,21 @@
 @endsection
 
 @push('js')
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('preview');
+        const file = event.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+</script>
 @endpush

@@ -62,6 +62,7 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>Foto</th>
                                     <th>Nombres</th>
                                     <th>Especialidad</th>
                                     <th>Idiomas</th>
@@ -73,6 +74,16 @@
                             <tbody>
                                 @foreach ($guias as $guia)
                                     <tr class="align-middle">
+                                        <td>
+                                            @if($guia->foto)
+                                                <img src="{{ asset('storage/' . $guia->foto) }}" 
+                                                     alt="Foto de {{ $guia->nombres }}" 
+                                                     class="img-thumbnail" 
+                                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                            @else
+                                                <span class="badge bg-secondary">Sin foto</span>
+                                            @endif
+                                        </td>
                                         <td>{{ $guia->nombres }}</td>
                                         <td>{{ $guia->especialidad }}</td>
                                         <td>{{ $guia->idiomas }}</td>
